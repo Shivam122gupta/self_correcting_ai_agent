@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Self-Correcting Agent Loop</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='/style.css') }}">
+</head>
+<body>
+    <main class="page-shell">
+        <section class="hero">
+            <div>
+                <span class="eyebrow">LangGraph · Groq Cloud AI · High-Speed Inference</span>
+                <h1>Self-Correcting Multi-Agent System</h1>
+                <p class="hero-copy">
+                    A Writer → Reviewer → Reviser workflow powered by Groq Cloud Inference that iteratively improves answers using distinct AI models until approved.
+                </p>
+            </div>
+            <div class="loop-badge">↻ AI agent loop</div>
+        </section>
+
+        <section class="inference-strip" aria-label="Inference configuration">
+            <div>
+                <span>Provider</span>
+                <strong>{{ runtime.provider }}</strong>
+            </div>
+            <div>
+                <span>Writer</span>
+                <strong>{{ runtime.writer_model }}</strong>
+            </div>
+            <div>
+                <span>Reviewer</span>
+                <strong>{{ runtime.reviewer_model }}</strong>
+            </div>
+            <div>
+                <span>Reviser</span>
+                <strong>{{ runtime.reviser_model }}</strong>
+            </div>
+        </section>
+
+        <section class="workflow" aria-label="Agent workflow">
+            <div class="workflow-node"><span>1</span><strong>Writer</strong><small>Create</small></div>
+            <div class="arrow">→</div>
+            <div class="workflow-node"><span>2</span><strong>Reviewer</strong><small>Evaluate</small></div>
+            <div class="arrow">→</div>
+            <div class="workflow-node"><span>3</span><strong>Reviser</strong><small>Improve</small></div>
+            <div class="loop-arrow">↩ Reviewer</div>
+        </section>
+
+        <section class="input-card">
+            <label for="topic">What should the agents explain?</label>
+            <div class="input-row">
+                <textarea id="topic" rows="4" maxlength="20000" placeholder="Enter your question or prompt here..." autocomplete="off">{{ example_topic }}</textarea>
+                <button id="runButton" type="button">Run Agent Loop</button>
+            </div>
+            <p class="hint">Try: “Explain recursion in programming” or paste a long detailed prompt.</p>
+        </section>
+
+        <section id="status" class="status hidden" aria-live="polite"></section>
+
+        <section id="results" class="results hidden">
+            <div class="section-heading">
+                <div>
+                    <span class="eyebrow">Execution trace</span>
+                    <h2>Watch the correction loop</h2>
+                </div>
+                <div id="summaryBadge" class="summary-badge"></div>
+            </div>
+            <div id="timeline" class="timeline"></div>
+            <div class="final-card">
+                <div class="final-heading">
+                    <div>
+                        <span class="eyebrow">Final output</span>
+                        <h2>Accepted Answer</h2>
+                    </div>
+                    <span id="finalDecision" class="decision"></span>
+                </div>
+                <div id="finalAnswer" class="answer"></div>
+            </div>
+        </section>
+    </main>
+    <script src="{{ url_for('static', path='/app.js') }}"></script>
+</body>
+</html>
