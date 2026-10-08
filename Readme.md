@@ -2,12 +2,6 @@
 
 An autonomous, self-correcting multi-agent engineering platform powered by **LangGraph**, **Groq Cloud LPU Inference**, and **FastAPI**.
 
-[![Deploy to Render](https://render.com/images/deploy-to-render.svg)](https://render.com/deploy)
-[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/template)
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
-
----
-
 ## 🌟 Overview
 
 SelfCorrect AI runs an autonomous **tri-agent evaluation loop** to eliminate AI hallucinations and generate verified, structured engineering specifications.
