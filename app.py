@@ -49,6 +49,13 @@ def workspace(request: Request):
     )
 
 
+@app.get("/health")
+@app.get("/ping")
+def health_check():
+    """Health check endpoint for UptimeRobot / uptime monitors to keep server awake 24/7."""
+    return {"status": "ok", "healthy": True}
+
+
 @app.get("/api/config")
 def config():
     """Safe runtime information for the UI/demo. Never returns secrets."""
