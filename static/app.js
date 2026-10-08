@@ -13,6 +13,20 @@ function escapeHtml(value = "") {
     return div.innerHTML;
 }
 
+function renderFormattedContent(text = "") {
+    if (!text) return "";
+    // Remove divider lines (---) if present
+    let cleaned = text.replace(/^[ \t]*[-*_]{3,}[ \t]*$/gm, '');
+    if (window.marked && typeof window.marked.parse === "function") {
+        try {
+            return window.marked.parse(cleaned);
+        } catch (e) {
+            console.error("Markdown parsing error:", e);
+        }
+    }
+    return escapeHtml(cleaned);
+}
+
 function setStatus(message, isError = false) {
     let text = message;
     if (typeof text === "object" && text !== null) {
@@ -39,7 +53,9 @@ function renderEvent(event, index) {
         const completeness = typeof event.completeness_score === 'number' ? (event.completeness_score * 100).toFixed(0) + '%' : 'N/A';
         const relevance = typeof event.relevance_score === 'number' ? (event.relevance_score * 100).toFixed(0) + '%' : 'N/A';
         const confidence = typeof event.confidence === 'number' ? (event.confidence * 100).toFixed(0) + '%' : 'N/A';
-        const hallucination = event.hallucination_detected ? '⚠️ YES' : '✓ None';
+        const hallucination = event.hallucination_detected 
+            ? '<span class="badge-flagged">⚠️ Detected</span>' 
+            : '<span class="badge-clean">✓ Clear</span>';
 
         let issuesHtml = '';
         if (Array.isArray(event.issues) && event.issues.length > 0) {
@@ -60,7 +76,7 @@ function renderEvent(event, index) {
             <div class="feedback"><strong>Feedback:</strong> ${escapeHtml(feedback)}</div>
         `;
     } else {
-        body = `<div class="answer">${escapeHtml(event.draft)}</div>`;
+        body = `<div class="answer">${renderFormattedContent(event.draft)}</div>`;
     }
 
     const decisionBadge = decision
@@ -125,7 +141,7 @@ async function runAgentLoop() {
         }
 
         timeline.innerHTML = data.events.map(renderEvent).join("");
-        finalAnswer.textContent = data.final_answer;
+        finalAnswer.innerHTML = renderFormattedContent(data.final_answer);
         finalDecision.textContent = data.final_decision || "DONE";
         finalDecision.className = `decision ${(data.final_decision || "pass").toLowerCase()}`;
 
@@ -149,7 +165,57 @@ async function runAgentLoop() {
     }
 }
 
+const charCount = document.getElementById("charCount");
+const copyBtn = document.getElementById("copyBtn");
+const promptChips = document.querySelectorAll(".chip");
+
+function updateCharCount() {
+    if (charCount && topicInput) {
+        charCount.textContent = topicInput.value.length;
+    }
+}
+
+if (topicInput) {
+    topicInput.addEventListener("input", updateCharCount);
+    updateCharCount();
+}
+
+if (promptChips) {
+    promptChips.forEach(chip => {
+        chip.addEventListener("click", () => {
+            const prompt = chip.getAttribute("data-prompt");
+            if (prompt && topicInput) {
+                topicInput.value = prompt;
+                updateCharCount();
+                topicInput.focus();
+                topicInput.scrollIntoView({ behavior: "smooth", block: "center" });
+            }
+        });
+    });
+}
+
+if (copyBtn && finalAnswer) {
+    copyBtn.addEventListener("click", async () => {
+        try {
+            const textToCopy = finalAnswer.innerText || finalAnswer.textContent;
+            await navigator.clipboard.writeText(textToCopy);
+            const originalHtml = copyBtn.innerHTML;
+            copyBtn.innerHTML = `<span>✓ Copied!</span>`;
+            copyBtn.classList.add("copied");
+            setTimeout(() => {
+                copyBtn.innerHTML = originalHtml;
+                copyBtn.classList.remove("copied");
+            }, 2000);
+        } catch (e) {
+            console.error("Failed to copy:", e);
+        }
+    });
+}
+
 runButton.addEventListener("click", runAgentLoop);
 topicInput.addEventListener("keydown", (event) => {
-    if (event.key === "Enter") runAgentLoop();
+    if (event.key === "Enter" && (event.ctrlKey || event.metaKey)) {
+        event.preventDefault();
+        runAgentLoop();
+    }
 });

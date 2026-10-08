@@ -27,12 +27,23 @@ class RunRequest(BaseModel):
 
 
 @app.get("/", response_class=HTMLResponse)
-def home(request: Request):
+def landing(request: Request):
     return templates.TemplateResponse(
         request=request,
         name="index.html",
         context={
-            "example_topic": "What is an AI agent?",
+            "runtime": get_runtime_info(),
+        },
+    )
+
+
+@app.get("/app", response_class=HTMLResponse)
+def workspace(request: Request):
+    return templates.TemplateResponse(
+        request=request,
+        name="workspace.html",
+        context={
+            "example_topic": "Explain the System Design of Apache Kafka with architecture and component tables",
             "runtime": get_runtime_info(),
         },
     )
@@ -62,4 +73,4 @@ def run_agents(payload: RunRequest):
 if __name__ == "__main__":
     # DigitalOcean App Platform provides PORT automatically.
     port = int(os.getenv("PORT", "8000"))
-    uvicorn.run("app:app", host="0.0.0.0", port=port, reload=False)
+    uvicorn.run("app:app", host="0.0.0.0", port=port, reload=True)

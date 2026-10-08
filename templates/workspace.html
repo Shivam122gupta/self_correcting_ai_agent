@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agent Workspace — SelfCorrect AI Console</title>
+    <meta name="description" content="Interactive workspace for running self-correcting multi-agent loops with Groq Cloud inference and LangGraph.">
+    <link rel="icon" type="image/png" href="{{ url_for('static', path='/logo.png') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', path='/style.css') }}">
+</head>
+<body class="workspace-page">
+
+    <!-- Top Navigation Header -->
+    <header class="site-header">
+        <div class="nav-container">
+            <div class="brand">
+                <a href="/" class="brand-link" title="Return to Landing Page">
+                    <img src="{{ url_for('static', path='/logo.png') }}" alt="SelfCorrect AI Logo" class="brand-logo-img">
+                    <div class="brand-text">
+                        <span class="brand-title">SelfCorrect<span class="accent-text">AI</span></span>
+                        <span class="brand-sub">CONSOLE GATEWAY</span>
+                    </div>
+                </a>
+            </div>
+
+            <nav class="nav-links">
+                <a href="/" class="nav-link">← Landing Page</a>
+                <a href="#demo" class="nav-link active">Agent Console</a>
+            </nav>
+
+            <div class="nav-actions">
+                <a href="https://github.com/Shivam122gupta/self_correcting_ai_agent" target="_blank" rel="noopener" class="btn-github-nav" title="View Source on GitHub">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+                    <span>GitHub</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="page-shell">
+        <div class="workspace-header">
+            <div class="workspace-title-box">
+                <span class="section-tag">INTERACTIVE WORKSPACE</span>
+                <h1>MULTI-AGENT CONSOLE</h1>
+                <p>Execute autonomous <span class="highlight">Writer → Reviewer → Reviser</span> loops in real time.</p>
+            </div>
+
+            <!-- Active Models Strip -->
+            <div class="models-strip">
+                <div class="model-item">
+                    <span>Writer</span>
+                    <strong>{{ runtime.writer_model }}</strong>
+                </div>
+                <div class="model-item">
+                    <span>Reviewer</span>
+                    <strong>{{ runtime.reviewer_model }}</strong>
+                </div>
+                <div class="model-item">
+                    <span>Reviser</span>
+                    <strong>{{ runtime.reviser_model }}</strong>
+                </div>
+            </div>
+        </div>
+
+        <!-- Interactive Agent Console -->
+        <section id="demo" class="demo-section">
+            <div class="input-card">
+                <div class="card-header">
+                    <h2>ENTER PROMPT / QUESTION</h2>
+                    <p>Enter a technical topic or system design question for multi-agent evaluation.</p>
+                </div>
+
+                <!-- Quick Prompt Suggestions -->
+                <div class="prompt-chips">
+                    <span class="chips-label">SUGGESTIONS:</span>
+                    <button type="button" class="chip" data-prompt="Explain the System Design of Apache Kafka with components table, architecture, and producer-consumer guarantees.">Kafka System Design</button>
+                    <button type="button" class="chip" data-prompt="Compare SQL vs NoSQL databases in detail with a comparison table of ACID, scalability, and use cases.">SQL vs NoSQL</button>
+                    <button type="button" class="chip" data-prompt="Explain recursion in programming with base cases, stack overflow risks, and a comparison with iteration.">Recursion</button>
+                    <button type="button" class="chip" data-prompt="Explain Redis cache eviction policies with LRU, LFU, TTL, and memory management strategies.">Redis Caching</button>
+                </div>
+
+                <div class="input-row">
+                    <textarea id="topic" rows="4" maxlength="20000" placeholder="Enter your prompt here..." autocomplete="off">{{ example_topic }}</textarea>
+                </div>
+
+                <div class="input-footer">
+                    <span class="char-counter"><span id="charCount">0</span> / 20000</span>
+                    <button id="runButton" type="button" class="btn-run">
+                        <span class="btn-text">Execute Agent Loop</span>
+                        <svg class="btn-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Status Indicator -->
+            <div id="status" class="status-box hidden" aria-live="polite"></div>
+
+            <!-- Execution Results & Trace -->
+            <div id="results" class="results-container hidden">
+                <div class="section-heading" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
+                    <div>
+                        <span class="section-tag">REALTIME AGENT TRACE</span>
+                        <h2 style="font-family: 'JetBrains Mono', monospace; font-size: 1.4rem; font-weight: 800; text-transform: uppercase; margin-top: 4px;">EXECUTION TIMELINE</h2>
+                    </div>
+                    <div id="summaryBadge" class="summary-badge"></div>
+                </div>
+
+                <!-- Step-by-Step Timeline -->
+                <div id="timeline" class="timeline"></div>
+
+                <!-- Accepted Final Answer -->
+                <div class="final-card">
+                    <div class="final-heading">
+                        <div>
+                            <span class="section-tag" style="background: var(--ops-emerald);">VERIFIED OUTPUT</span>
+                            <h2>ACCEPTED FINAL ANSWER</h2>
+                        </div>
+                        <div class="final-actions">
+                            <span id="finalDecision" class="decision"></span>
+                            <button id="copyBtn" class="btn-copy" type="button" title="Copy answer">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                                <span>Copy</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div id="finalAnswer" class="answer"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Site Footer -->
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-brand">
+                <div class="footer-brand-header">
+                    <img src="{{ url_for('static', path='/logo.png') }}" alt="SelfCorrect AI Logo" class="footer-logo-img">
+                    <span class="brand-title">SelfCorrect<span class="accent-text">AI</span></span>
+                </div>
+                <p>Created by <a href="https://github.com/Shivam122gupta/self_correcting_ai_agent" target="_blank" rel="noopener" class="footer-link">Shivam122gupta</a> · LangGraph Multi-Agent Engine</p>
+            </div>
+            <div class="footer-meta">
+                <a href="https://github.com/Shivam122gupta/self_correcting_ai_agent" target="_blank" rel="noopener" class="footer-link">GitHub Repository</a>
+                <span>·</span>
+                <a href="/" class="footer-link">Landing Page</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="{{ url_for('static', path='/app.js') }}"></script>
+</body>
+</html>

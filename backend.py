@@ -303,7 +303,8 @@ def writer(state: State):
                     "- For simple topics: explain clearly and concisely.\n"
                     "- For complex, architectural, or multi-part questions: cover ALL requested components, edge cases, failure prevention mechanisms, trade-offs, and quantitative comparisons in depth.\n"
                     "- Do NOT invent false facts, unsupported technical assertions, or hallucinations.\n"
-                    "- Organize your response clearly with markdown headings and structured bullet points."
+                    "- When explaining system design components, comparisons, definitions, or structured data, ALWAYS format them as standard markdown tables (| Component | Description | Role |) for crisp organization.\n"
+                    "- Do NOT use decorative divider lines (---) or excessive symbols."
                 ),
             },
             {"role": "user", "content": f"Explain/Answer: {state['topic']}"},
@@ -398,6 +399,8 @@ def reviser(state: State):
                     "- Preserve all accurate, well-explained information and fix ONLY the identified flaws, missing technical details, or unsupported claims.\n"
                     "- Address EVERY identified issue directly.\n"
                     "- Do NOT introduce new hallucinations, unverified claims, or off-topic information.\n"
+                    "- Present structured definitions, system design components, or comparisons in clean markdown tables (| Component | Details |).\n"
+                    "- Do NOT use decorative lines (---) or redundant symbols.\n"
                     "Return ONLY the complete, improved answer text."
                 ),
             },

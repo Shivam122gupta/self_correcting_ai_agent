@@ -3,82 +3,195 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Self-Correcting Agent Loop</title>
+    <title>SelfCorrect AI — Multi-Agent Engineering Platform</title>
+    <meta name="description" content="An autonomous multi-agent AI engineering platform (Writer → Reviewer → Reviser) powered by Groq Cloud Inference and LangGraph.">
+    <link rel="icon" type="image/png" href="{{ url_for('static', path='/logo.png') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', path='/style.css') }}">
 </head>
-<body>
-    <main class="page-shell">
-        <section class="hero">
-            <div>
-                <span class="eyebrow">LangGraph · Groq Cloud AI · High-Speed Inference</span>
-                <h1>Self-Correcting Multi-Agent System</h1>
-                <p class="hero-copy">
-                    A Writer → Reviewer → Reviser workflow powered by Groq Cloud Inference that iteratively improves answers using distinct AI models until approved.
-                </p>
-            </div>
-            <div class="loop-badge">↻ AI agent loop</div>
-        </section>
+<body class="landing-page">
 
-        <section class="inference-strip" aria-label="Inference configuration">
-            <div>
-                <span>Provider</span>
-                <strong>{{ runtime.provider }}</strong>
-            </div>
-            <div>
-                <span>Writer</span>
-                <strong>{{ runtime.writer_model }}</strong>
-            </div>
-            <div>
-                <span>Reviewer</span>
-                <strong>{{ runtime.reviewer_model }}</strong>
-            </div>
-            <div>
-                <span>Reviser</span>
-                <strong>{{ runtime.reviser_model }}</strong>
-            </div>
-        </section>
-
-        <section class="workflow" aria-label="Agent workflow">
-            <div class="workflow-node"><span>1</span><strong>Writer</strong><small>Create</small></div>
-            <div class="arrow">→</div>
-            <div class="workflow-node"><span>2</span><strong>Reviewer</strong><small>Evaluate</small></div>
-            <div class="arrow">→</div>
-            <div class="workflow-node"><span>3</span><strong>Reviser</strong><small>Improve</small></div>
-            <div class="loop-arrow">↩ Reviewer</div>
-        </section>
-
-        <section class="input-card">
-            <label for="topic">What should the agents explain?</label>
-            <div class="input-row">
-                <textarea id="topic" rows="4" maxlength="20000" placeholder="Enter your question or prompt here..." autocomplete="off">{{ example_topic }}</textarea>
-                <button id="runButton" type="button">Run Agent Loop</button>
-            </div>
-            <p class="hint">Try: “Explain recursion in programming” or paste a long detailed prompt.</p>
-        </section>
-
-        <section id="status" class="status hidden" aria-live="polite"></section>
-
-        <section id="results" class="results hidden">
-            <div class="section-heading">
-                <div>
-                    <span class="eyebrow">Execution trace</span>
-                    <h2>Watch the correction loop</h2>
-                </div>
-                <div id="summaryBadge" class="summary-badge"></div>
-            </div>
-            <div id="timeline" class="timeline"></div>
-            <div class="final-card">
-                <div class="final-heading">
-                    <div>
-                        <span class="eyebrow">Final output</span>
-                        <h2>Accepted Answer</h2>
+    <!-- Top Navigation Header -->
+    <header class="site-header">
+        <div class="nav-container">
+            <div class="brand">
+                <a href="/" class="brand-link">
+                    <img src="{{ url_for('static', path='/logo.png') }}" alt="SelfCorrect AI Logo" class="brand-logo-img">
+                    <div class="brand-text">
+                        <span class="brand-title">SelfCorrect<span class="accent-text">AI</span></span>
+                        <span class="brand-sub">LangGraph Engine</span>
                     </div>
-                    <span id="finalDecision" class="decision"></span>
+                </a>
+            </div>
+
+            <nav class="nav-links">
+                <a href="#architecture" class="nav-link">Architecture</a>
+                <a href="#features" class="nav-link">Features</a>
+                <a href="/app" class="nav-link highlight-link">Console Workspace</a>
+            </nav>
+
+            <div class="nav-actions">
+                <a href="https://github.com/Shivam122gupta/self_correcting_ai_agent" target="_blank" rel="noopener" class="btn-github-nav" title="View Source on GitHub">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+                    <span>GitHub</span>
+                </a>
+                <a href="/app" class="btn-header-cta">
+                    <span>Launch Console</span>
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="page-shell">
+        <!-- Hero Section -->
+        <section id="platform" class="hero-section">
+            <div class="hero-badge">
+                ⚡ AUTONOMOUS MULTI-AGENT PLATFORM
+            </div>
+            
+            <h1 class="hero-title">
+                SELF-CORRECTING <span class="gradient-text">AI AGENTS</span>
+            </h1>
+            
+            <p class="hero-subtitle">
+                A tri-agent architecture (<span class="highlight">Writer → Reviewer → Reviser</span>) built with LangGraph to eliminate hallucinations and generate verified engineering specifications.
+            </p>
+
+            <div class="hero-actions">
+                <a href="/app" class="btn-primary">
+                    <span>Launch Console Workspace</span>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </a>
+                <a href="https://github.com/Shivam122gupta/self_correcting_ai_agent" target="_blank" rel="noopener" class="btn-secondary">
+                    <span>GitHub Repository</span>
+                </a>
+            </div>
+
+            <!-- System Specs Strip -->
+            <div class="system-stats">
+                <div class="stat-card">
+                    <span class="stat-label">Inference Engine</span>
+                    <strong class="stat-value">{{ runtime.provider }}</strong>
                 </div>
-                <div id="finalAnswer" class="answer"></div>
+                <div class="stat-card">
+                    <span class="stat-label">Writer Model</span>
+                    <strong class="stat-value">{{ runtime.writer_model }}</strong>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">Reviewer Model</span>
+                    <strong class="stat-value">{{ runtime.reviewer_model }}</strong>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">Reviser Model</span>
+                    <strong class="stat-value">{{ runtime.reviser_model }}</strong>
+                </div>
+            </div>
+        </section>
+
+        <!-- Architecture Flow Section -->
+        <section id="architecture" class="architecture-section">
+            <div class="section-tag">ARCHITECTURE</div>
+            <h2 class="section-title">Tri-Agent Self-Correction Pipeline</h2>
+            <p class="section-desc">Three specialized AI agents collaborate autonomously to evaluate and refine answers.</p>
+
+            <div class="workflow-grid">
+                <div class="workflow-card">
+                    <div class="card-step">01</div>
+                    <div class="card-icon-box writer-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                    </div>
+                    <h3>Writer Agent</h3>
+                    <p>Generates an in-depth initial answer covering all requested concepts and edge cases.</p>
+                    <span class="card-tag">Model: {{ runtime.writer_model }}</span>
+                </div>
+
+                <div class="flow-arrow">→</div>
+
+                <div class="workflow-card highlighted">
+                    <div class="card-step">02</div>
+                    <div class="card-icon-box reviewer-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+                    </div>
+                    <h3>Reviewer Agent</h3>
+                    <p>Adversarially scores Factual Accuracy, Completeness, and Relevance to detect missing requirements.</p>
+                    <span class="card-tag alert">Threshold: {{ runtime.min_factual_score * 100 }}%</span>
+                </div>
+
+                <div class="flow-arrow">→</div>
+
+                <div class="workflow-card">
+                    <div class="card-step">03</div>
+                    <div class="card-icon-box reviser-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21.5 2v6h-6"/><path d="M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                    </div>
+                    <h3>Reviser Agent</h3>
+                    <p>Directly fixes identified issues until the Reviewer gives a PASS verdict.</p>
+                    <span class="card-tag">Max Revisions: {{ runtime.max_revisions }}</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Platform Features Grid Section -->
+        <section id="features" class="features-section">
+            <div class="section-tag">FEATURES</div>
+            <h2 class="section-title">Built for Reliability</h2>
+
+            <div class="features-grid">
+                <div class="feature-card">
+                    <h3>Zero Hallucinations</h3>
+                    <p>Quantitative factual thresholding rejects unsupported claims and sends drafts back for revision.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>HTML Table Formatting</h3>
+                    <p>System design specifications and component breakdowns are structured into responsive tables.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Sub-Second Inference</h3>
+                    <p>Powered by Groq Cloud LPU acceleration for high-speed multi-agent execution turns.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Execution Trace</h3>
+                    <p>Real-time visual trace tracking scores, reviewer feedback, and iteration passes.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA Bottom Banner Section -->
+        <section class="cta-banner-section">
+            <div class="cta-banner-card">
+                <div class="cta-content">
+                    <h2>READY TO TRY SELF-CORRECTING AGENTS?</h2>
+                    <p>Launch the interactive workspace and test prompts in real time.</p>
+                </div>
+                <div class="cta-action">
+                    <a href="/app" class="btn-primary">
+                        <span>Launch Console Workspace</span>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                    </a>
+                </div>
             </div>
         </section>
     </main>
-    <script src="{{ url_for('static', path='/app.js') }}"></script>
+
+    <!-- Site Footer -->
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-brand">
+                <div class="footer-brand-header">
+                    <img src="{{ url_for('static', path='/logo.png') }}" alt="SelfCorrect AI Logo" class="footer-logo-img">
+                    <span class="brand-title">SelfCorrect<span class="accent-text">AI</span></span>
+                </div>
+                <p>Created by <a href="https://github.com/Shivam122gupta/self_correcting_ai_agent" target="_blank" rel="noopener" class="footer-link">Shivam122gupta</a> · LangGraph Multi-Agent Engine</p>
+            </div>
+            <div class="footer-meta">
+                <a href="https://github.com/Shivam122gupta/self_correcting_ai_agent" target="_blank" rel="noopener" class="footer-link">GitHub Repository</a>
+                <span>·</span>
+                <a href="/app" class="footer-link">Launch Workspace</a>
+            </div>
+        </div>
+    </footer>
 </body>
 </html>
