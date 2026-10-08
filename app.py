@@ -49,8 +49,8 @@ def workspace(request: Request):
     )
 
 
-@app.get("/health")
-@app.get("/ping")
+@app.api_route("/health", methods=["GET", "HEAD", "POST", "OPTIONS"])
+@app.api_route("/ping", methods=["GET", "HEAD", "POST", "OPTIONS"])
 def health_check():
     """Health check endpoint for UptimeRobot / uptime monitors to keep server awake 24/7."""
     return {"status": "ok", "healthy": True}
